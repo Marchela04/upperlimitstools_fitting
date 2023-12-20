@@ -1,6 +1,6 @@
 # tau_UpperLimitsTools_fitting
 
-A small package to perform Upper Limits and Fits build on top of ROOT. Common tools within the tau group at Belle II experiment.
+A small package to perform Upper Limits and Fits built on top of ROOT. Common tools within the tau group at Belle II experiment.
 
 -contribute
 ```
