@@ -3,11 +3,11 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 [project]
 name = "tau_upperlimitstools_fitting"
-version = "0.0.1"
+version = "0.0.8"
 authors = [
   { name="Marcela Garcia", email="marciah@post.kek.jp" },
 ]
-description = "A small package for UL and fitting within the tau group at Belle II"
+description = "Tau_upperlimitstools_fitting based on ROOT."
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [

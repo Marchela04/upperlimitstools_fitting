@@ -1,20 +1,39 @@
 # tau_UpperLimitsTools_fitting
 
-A small package to perform Upper Limits and Fits built on top of ROOT. Common tools within the tau group at Belle II experiment.
+"""
+A small (package) collection of examples to obtain fits and upper limits for cLFV.  
 
--contribute
+Tau_upperlimitstools_fitting based on ROOT.
+
+Essential tools used by the tau group at Belle II experiment.
+
+"""
+
+- Description 
+
+The module facilitates the creation/configuration of the S+B extended model.
+
+Functions for calculating upper limits on model parameters using both asymptotic and toy-based methods are included.
+
+ The module also provides utilities for printing and saving results, as well as generating Brazil band plots to visualize confidence intervals.
+
+Each function is documented with informative docstrings (AI assistance), offering a guide on their usage.
+
+- Contribute
 ```
+Add functions, models, or refine existing ones to shape a collaborative resource.
+
+1. Clone the repo 
+
 git clone https://gitlab.desy.de/belle2/physics/tau/tau_upperlimitstools_fitting.git
-git checkout -b feature/adding_functions
-git push origin feature/adding_functions 
-```
--Merge request
 
+2. Push your changes!.
+
+```
 
 Note:
-
 The project contains configuration files to be uploaded in the future to PyPI. 
 
-Tested on test.pypi
+Right now, you can try it out by downloading it from test.pypi:
 
 python3 -m pip install --index-url https://test.pypi.org/simple/ --no-deps tau_upperlimitstools_fitting
