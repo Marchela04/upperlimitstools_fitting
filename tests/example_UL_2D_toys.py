@@ -12,7 +12,7 @@ upperlimit_configuration={'toys_CLs':{ "workspace":{
                                                              "one_side":True,
                                                              "confidence_level":0.90,
                                                              "points_to_scan":10,
-                                                             "toy_number":100,
+                                                             "toy_number":200,
                                                              "poi_min":0,
                                                              "poi_max":35,
                                                              "set_verbose":False,

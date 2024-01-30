@@ -58,7 +58,7 @@ def check_dictionary_model(model_dict):
         print("Error: Key 'model_sb' not found in the dictionary.")
         return False
     model_sb_dict = model_dict['model_sb']
-    if 'signal' not in model_sb_dict or 'background' not in model_sb_dict or 'variables_names' not in model_sb_dict or 'dimension' not in model_sb_dict:
+    if 'signal' not in model_sb_dict or 'background' not in model_sb_dict or 'variables_names' not in model_sb_dict or 'dimension' not in model_sb_dict or 'generate_data' not in model_sb_dict or 'include_binned_data' not in model_sb_dict or 'data_bins' not in model_sb_dict or 'pseudo_data_yields' not in model_sb_dict:
         print("Error: Incorrect internal structure of 'model_sb'.")
         return False
     signal_dict = model_sb_dict['signal']

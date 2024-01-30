@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 [project]
 name = "tau_upperlimitstools_fitting"
-version = "0.0.8"
+version = "1.0"
 authors = [
   { name="Marcela Garcia", email="marciah@post.kek.jp" },
 ]

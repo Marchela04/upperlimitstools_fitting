@@ -1,14 +1,14 @@
 Expected upper limits, using the B (alternate) model : 
 expected limit (median)
-40.841082601151925
+44.64318018621834
 expected limit (-1 sig)
-28.330103637398814
+30.931964457963822
 expected limit (+1 sig)
-59.68857314295125
+65.2057157405719
 expected limit (-2 sig)
-20.539230072508445
+22.607974537309644
 expected limit (+2 sig)
-83.81534318796714
+91.5382173905235
 --------------------------------------------
 The observed CLs upper limit is:
-42.72753163872532
+37.31437163281051

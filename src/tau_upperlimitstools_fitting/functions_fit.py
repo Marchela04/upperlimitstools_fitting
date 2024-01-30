@@ -151,6 +151,9 @@ def create_exponential_histogram_2D(exp_scale, exp_events, hist_ranges, hist_nam
 def create_workspace_extended(model_configuration):
     """
     Create and return the S+B extended model in a WorkSpace given the input configuration.
+    Define the configuration for S+B extended model for the 1D or 2D case.
+    Option to fenerate pseudo data from a pre-defined S+B model in myWorkSpace.
+
 
     Parameters
     ----------
@@ -171,7 +174,11 @@ def create_workspace_extended(model_configuration):
                 },
                 'variables_names': ['<variable_name_1>', '<variable_name_2>', ...],
                 'variables_ranges': ['[<min_1>, <max_1>]', '[<min_2>, <max_2>]', ...],
-                'dimension': "<1D_or_2D>"
+                'dimension': "<1D_or_2D>",
+                'generate_data': <bool>,
+                'include_binned_data':<bool>,
+                'data_bins' : <int>, 
+                'pseudo_data_yields':{'n_sig':<int>, 'n_bkg':<int>}
             }
         }
 
@@ -203,7 +210,11 @@ def create_workspace_extended(model_configuration):
     ...         },
     ...         'variables_names': ['x'],
     ...         'variables_ranges': ['[0, 10]'],
-    ...         'dimension': "1D"
+    ...         'dimension': "1D",
+                'generate_data': True,
+                'include_binned_data':True,
+                'data_bins' : 100, 
+                'pseudo_data_yields':{'n_sig':1, 'n_bkg':2000}
     ...     }
     ... }
     >>> workspace = create_workspace_extended(model_configuration)
@@ -241,10 +252,15 @@ def create_workspace_extended(model_configuration):
     myWorkSpace.factory(f"n_sig{model_configuration['model_sb']['signal']['nsig_yield_range']}")
     myWorkSpace.factory(f"n_bkg{model_configuration['model_sb']['background']['nbkg_yield_range']}")
     myWorkSpace.factory(f"SUM:model_sb(n_sig*{model_configuration['model_sb']['signal']['pdf_name']}, n_bkg*{model_configuration['model_sb']['background']['pdf_name']})")
+    myWorkSpace = model_configuration_extended(myWorkSpace,variables_names, model_configuration['model_sb']['dimension'])
+    if model_configuration['model_sb']['generate_data']:
+        myWorkSpace = generate_pseudodata_fromW(myWorkSpace, variables_names, variables_argset, model_configuration['model_sb']['dimension'], 
+                                                model_configuration['model_sb']['pseudo_data_yields'],model_configuration['model_sb']['include_binned_data'], 
+                                                model_configuration['model_sb']['data_bins'])
 
     return myWorkSpace
 
-def model_configuration_extended(myWorkSpace, dimension):
+def model_configuration_extended(myWorkSpace,variables_names, dimension):
     """
     Define the configuration for S+B extended model for the 1D or 2D case.
 
@@ -256,6 +272,8 @@ def model_configuration_extended(myWorkSpace, dimension):
     ----------
     myWorkSpace : ROOT.RooWorkspace
         RooFit workspace containing the necessary variables and models.
+    
+    variables_names: list
 
     dimension : str
         Dimensionality of the model, either "1D" or "2D".
@@ -274,18 +292,17 @@ def model_configuration_extended(myWorkSpace, dimension):
     mc.SetParametersOfInterest(set_n_sig)
     
     if dimension =="1D":
-        mc.SetObservables(ROOT.RooArgSet(myWorkSpace.var('x')))
+        mc.SetObservables(ROOT.RooArgSet(myWorkSpace.var(variables_names[0])))
     elif dimension == "2D":
-        mc.SetObservables(ROOT.RooArgSet(myWorkSpace.var('x'), myWorkSpace.var('y')))
+        mc.SetObservables(ROOT.RooArgSet(myWorkSpace.var(variables_names[0]), myWorkSpace.var(variables_names[1])))
     
     mc.SetNuisanceParameters(set_n_bkg)
     
     #Import the mc to the WorkSpace
     myWorkSpace.Import(mc)
-    
     return myWorkSpace
 
-def generate_pseudodata_fromW(myWorkSpace, dimension, yield_values, data_binned=False, data_bins=100):
+def generate_pseudodata_fromW(myWorkSpace, variables_names, variables_argset, dimension, yield_values, data_binned=False, data_bins=100):
     """
     Generate pseudo data from a pre-defined S+B model in myWorkSpace.
 
@@ -293,6 +310,11 @@ def generate_pseudodata_fromW(myWorkSpace, dimension, yield_values, data_binned=
     ----------
     myWorkSpace : ROOT.RooWorkspace
         RooFit workspace containing the S+B model.
+    
+    variables_names: list
+    
+    variables_argset: RooArgSet
+
 
     dimension : str
         Dimensionality of the model, either "1D" or "2D".
@@ -312,12 +334,6 @@ def generate_pseudodata_fromW(myWorkSpace, dimension, yield_values, data_binned=
     ROOT.RooWorkspace
         Updated RooFit workspace with generated pseudo data.
     """
-    if dimension == "1D":
-        variables_argset = ROOT.RooArgSet(myWorkSpace.var('x'))
-    elif dimension == "2D":
-        variables_argset = ROOT.RooArgSet(myWorkSpace.var('x'), myWorkSpace.var('y'))
-    else:
-        raise ValueError("Please select dimension to be 1D or 2D")
 
     myWorkSpace.var("n_sig").setVal(yield_values['n_sig'])
     myWorkSpace.var("n_bkg").setVal(yield_values['n_bkg'])
@@ -327,9 +343,9 @@ def generate_pseudodata_fromW(myWorkSpace, dimension, yield_values, data_binned=
     myWorkSpace.Import(pseudo_data)
 
     if data_binned:
-        myWorkSpace.var('x').setBins(data_bins)
+        myWorkSpace.var(variables_names[0]).setBins(data_bins)
         if dimension == "2D":
-            myWorkSpace.var('y').setBins(data_bins)
+            myWorkSpace.var(variables_names[1]).setBins(data_bins)
         pseudo_data_binned = ROOT.RooDataHist("pseudo_data_binned", "pseudo_data_binned", variables_argset, pseudo_data)
         pseudo_data_binned.SetName("pseudo_data_binned")
         myWorkSpace.Import(pseudo_data_binned)
@@ -379,11 +395,35 @@ def check_status_fit(fitResult):
 def create_workspace_extended_gausExp(model_configuration):
     """
     Model definition via WorkSpace given the input configuration.
-    This function return a simple 1D S+B model for the most commun functions.
-    At the moment you can choose for the combinations of funtion_signal and funtion_background
-    -Gaussian
-    -Exponential
-    -
+    This function return a simple 1D S+B model for the Gaussian &  Exponential functions, for signal and background, respectively.
     """
+    # Check if the input dictionary TO DO
+
+    variables_names = model_configuration['model_sb']['variables_names']
+    variables_ranges = model_configuration['model_sb']['variables_ranges']
+    
+    # Create RooWorkspace
+    myWorkSpace = ROOT.RooWorkspace("myWorkSpace")
+    x = myWorkSpace.factory(f"{variables_names[0]}{variables_ranges[0]}")
+    if model_configuration['model_sb']['dimension'] == "1D":
+        variables_arglist = ROOT.RooArgList(x)
+        variables_argset = ROOT.RooArgSet(x)
+    elif model_configuration['model_sb']['dimension'] == "2D":
+        print("TO DO")
+        return
+
+    myWorkSpace.factory(f"Gaussian::{model_configuration['model_sb']['signal']['pdf_name']}({variables_names[0]}, {model_configuration['model_sb']['signal']['mean']}, {model_configuration['model_sb']['signal']['sigma']})")
+    myWorkSpace.factory(f"Exponential::{model_configuration['model_sb']['background']['pdf_name']}({variables_names[0]}, {model_configuration['model_sb']['signal']['coefficient']})")
+    myWorkSpace.factory(f"SUM:model_sb(n_sig*{model_configuration['model_sb']['signal']['pdf_name']}, n_bkg*{model_configuration['model_sb']['background']['pdf_name']})")
+    myWorkSpace = model_configuration_extended(myWorkSpace, variables_names, model_configuration['model_sb']['dimension'])
+
     print("TO DO")
     return myWorkSpace
+
+def create_workspace_HistFactory(model_configuration):
+
+    """
+    Model definition via WorkSpace given the input configuration.
+    The workspace is created via HistFactory
+    """
+    print("TO DO")
