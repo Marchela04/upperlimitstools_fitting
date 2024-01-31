@@ -152,7 +152,7 @@ def create_workspace_extended(model_configuration):
     """
     Create and return the S+B extended model in a WorkSpace given the input configuration.
     Define the configuration for S+B extended model for the 1D or 2D case.
-    Option to fenerate pseudo data from a pre-defined S+B model in myWorkSpace.
+    Option to generate pseudo data from a pre-defined S+B model in myWorkSpace.
 
 
     Parameters

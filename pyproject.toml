@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 name = "tau_upperlimitstools_fitting"
 version = "1.0"
 authors = [
-  { name="Marcela Garcia", email="marciah@post.kek.jp" },
+  { name="Marcela Garcia", email="mgarciah@post.kek.jp" },
 ]
 description = "Tau_upperlimitstools_fitting based on ROOT."
 readme = "README.md"
