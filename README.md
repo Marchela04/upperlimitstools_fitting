@@ -34,8 +34,8 @@ git clone https://gitlab.desy.de/belle2/physics/tau/tau_upperlimitstools_fitting
 Note:
 Requirements ROOT >= 6.26/02.
 
-The project contains configuration files to be uploaded in the future to PyPI. 
+**You can download the project from PyPI. **
 
-Right now, you can try it out by downloading it from test.pypi:
+https://pypi.org/project/tau-upperlimitstools-fitting/
 
-python3 -m pip install --index-url https://test.pypi.org/simple/ --no-deps tau_upperlimitstools_fitting
+python3 -m pip install tau_upperlimitstools_fitting
