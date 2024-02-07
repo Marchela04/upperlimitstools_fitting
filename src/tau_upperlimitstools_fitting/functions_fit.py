@@ -393,11 +393,87 @@ def check_status_fit(fitResult):
     print('--------------------------------------------')
 
 def create_workspace_extended_gausExp(model_configuration):
+    #TO DO :  This can be generalized
     """
-    Model definition via WorkSpace given the input configuration.
-    This function return a simple 1D S+B model for the Gaussian &  Exponential functions, for signal and background, respectively.
+    Create and return a Workspace with a customized S+B extended model based on the input configuration.
+    A simple 1D S+B model for the Gaussian &  Exponential functions, for signal and background, respectively.
+
+    Parameters
+    ----------
+    model_configuration : dict
+        A dictionary containing the configuration for the S+B model. It should have the following structure:
+
+        {
+            'model_sb': {
+                'signal': {
+                    'function': "<signal_gaussian_function>",
+                    'mean': "<mean_expression>",
+                    'sigma': "<sigma_expression>",
+                    'pdf_name': '<signal_pdf_name>',
+                    'nsig_yield_range': '[<min>, <max>]'
+                },
+                'background': {
+                    'function': "<background_exponential_function>",
+                    'coefficient': "<coefficient_expression>",
+                    'pdf_name': '<background_pdf_name>',
+                    'nbkg_yield_range': '[<min>, <max>]'
+                },
+                'variables_names': ['<variable_name_1>', '<variable_name_2>', ...],
+                'variables_ranges': ['[<min_1>, <max_1>]', '[<min_2>, <max_2>]', ...],
+                'dimension': "<1D_or_2D>",
+                'generate_data': <True_or_False>,
+                'include_binned_data': <True_or_False>,
+                'data_bins': <number_of_bins>,
+                'pseudo_data_yields': {
+                    'n_sig': <signal_yield>,
+                    'n_bkg': <background_yield>
+                }
+            }
+        }
+
+    Returns
+    -------
+    myWorkSpace : ROOT.RooWorkspace
+        The RooWorkspace containing the customized S+B extended model.
+
+    Notes
+    -----
+    - The 'nsig_yield_range' and 'nbkg_yield_range' values are expected to be in the form of a string representing a numeric range (e.g., '[-10, 1000]').
+    - The 'variables_ranges' list should contain strings representing the variable ranges in the form of '[<min>, <max>]'.
+    - The 'dimension' field should be a string indicating the dimension of the model, either "1D" or "2D".
+    - Ensure that the functions provided for signal and background are compatible with ROOT.RooAbsPdf.
+    - The 'generate_data' flag controls whether pseudo-data is generated.
+    - The 'include_binned_data' flag controls whether binned data is included in the workspace.
+
+    Example
+    -------
+    >>> model_configuration = {
+    ...     'model_sb': {
+    ...         'signal': {
+    ...             'function': "gaussian",
+    ...             'mean': "m[5]",
+    ...             'sigma': "s[1]",
+    ...             'pdf_name': 'signal_pdf',
+    ...             'nsig_yield_range': '[-20, 1000]'
+    ...         },
+    ...         'background': {
+    ...             'function': "exponential",
+    ...             'coefficient': "c[-1/4]",
+    ...             'pdf_name': 'background_pdf',
+    ...             'nbkg_yield_range': '[-10, 3000]'
+    ...         },
+    ...         'variables_names': ['x'],
+    ...         'variables_ranges': ['[0, 10]'],
+    ...         'dimension': "1D",
+    ...         'generate_data': True,
+    ...         'include_binned_data': True,
+    ...         'data_bins': 100,
+    ...         'pseudo_data_yields': {'n_sig': 1, 'n_bkg': 2000}
+    ...     }
+    ... }
+    >>> workspace = create_workspace_custom(model_configuration)
     """
-    # Check if the input dictionary TO DO
+    # Check the input dictionary TO DO
 
     variables_names = model_configuration['model_sb']['variables_names']
     variables_ranges = model_configuration['model_sb']['variables_ranges']
@@ -411,13 +487,16 @@ def create_workspace_extended_gausExp(model_configuration):
     elif model_configuration['model_sb']['dimension'] == "2D":
         print("TO DO")
         return
-
+    myWorkSpace.factory(f"n_sig{model_configuration['model_sb']['signal']['nsig_yield_range']}")
+    myWorkSpace.factory(f"n_bkg{model_configuration['model_sb']['background']['nbkg_yield_range']}")
     myWorkSpace.factory(f"Gaussian::{model_configuration['model_sb']['signal']['pdf_name']}({variables_names[0]}, {model_configuration['model_sb']['signal']['mean']}, {model_configuration['model_sb']['signal']['sigma']})")
-    myWorkSpace.factory(f"Exponential::{model_configuration['model_sb']['background']['pdf_name']}({variables_names[0]}, {model_configuration['model_sb']['signal']['coefficient']})")
+    myWorkSpace.factory(f"Exponential::{model_configuration['model_sb']['background']['pdf_name']}({variables_names[0]}, {model_configuration['model_sb']['background']['coefficient']})")
     myWorkSpace.factory(f"SUM:model_sb(n_sig*{model_configuration['model_sb']['signal']['pdf_name']}, n_bkg*{model_configuration['model_sb']['background']['pdf_name']})")
     myWorkSpace = model_configuration_extended(myWorkSpace, variables_names, model_configuration['model_sb']['dimension'])
-
-    print("TO DO")
+    if model_configuration['model_sb']['generate_data']:
+        myWorkSpace = generate_pseudodata_fromW(myWorkSpace, variables_names, variables_argset, model_configuration['model_sb']['dimension'], 
+                                                model_configuration['model_sb']['pseudo_data_yields'],model_configuration['model_sb']['include_binned_data'], 
+                                                model_configuration['model_sb']['data_bins'])
     return myWorkSpace
 
 def create_workspace_HistFactory(model_configuration):
