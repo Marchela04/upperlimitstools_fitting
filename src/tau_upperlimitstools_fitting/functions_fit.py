@@ -165,12 +165,14 @@ def create_workspace_extended(model_configuration):
                 'signal': {
                     'histogram': <TH1D>,
                     'pdf_name': '<signal_pdf_name>',
-                    'nsig_yield_range': '[<min>, <max>]'
+                    'nsig_yield_range': '[<min>, <max>]',
+                    'set_interpolation_order: int'
                 },
                 'background': {
                     'histogram': <TH1D>,
                     'pdf_name': '<background_pdf_name>',
-                    'nbkg_yield_range': '[<min>, <max>]'
+                    'nbkg_yield_range': '[<min>, <max>]',
+                    'set_interpolation_order: int'
                 },
                 'variables_names': ['<variable_name_1>', '<variable_name_2>', ...],
                 'variables_ranges': ['[<min_1>, <max_1>]', '[<min_2>, <max_2>]', ...],
@@ -241,9 +243,9 @@ def create_workspace_extended(model_configuration):
     # Create signal and background RooHistPdfs
     print("Creating HistPDFs")
     datahist_vars_signal= ROOT.RooDataHist("datahist_vars_signal", "datahist_vars_signal",variables_arglist, model_configuration['model_sb']['signal']['histogram'])
-    pdf_signal = ROOT.RooHistPdf(model_configuration['model_sb']['signal']['pdf_name'],model_configuration['model_sb']['signal']['pdf_name'],variables_argset,datahist_vars_signal,0)
+    pdf_signal = ROOT.RooHistPdf(model_configuration['model_sb']['signal']['pdf_name'],model_configuration['model_sb']['signal']['pdf_name'],variables_argset,datahist_vars_signal,model_configuration['model_sb']['signal']['set_interpolation_order'])
     datahist_vars_background= ROOT.RooDataHist("datahist_vars_background", "datahist_vars_background",variables_arglist, model_configuration['model_sb']['background']['histogram'])
-    pdf_background = ROOT.RooHistPdf(model_configuration['model_sb']['background']['pdf_name'],model_configuration['model_sb']['background']['pdf_name'],variables_argset,datahist_vars_background,0)
+    pdf_background = ROOT.RooHistPdf(model_configuration['model_sb']['background']['pdf_name'],model_configuration['model_sb']['background']['pdf_name'],variables_argset,datahist_vars_background,model_configuration['model_sb']['background']['set_interpolation_order'])
     
     # Model definition in WorkSpace
     print("Creating model in WorkSpace")
